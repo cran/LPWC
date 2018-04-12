@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Thevaa Chandereng &amp; Anthony Gitter" />
+
+
+<title>LPWC: Lag Penalized Weighted Correlation for Clustering Short Time Series</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">LPWC: Lag Penalized Weighted Correlation for Clustering Short Time Series</h1>
+<h4 class="author"><em>Thevaa Chandereng &amp; Anthony Gitter</em></h4>
+
+
+
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>Time series data are a series of observations collected across different timepoints in which the ordering of the observations can convey important information. In biology, most time series data consist of a limited number of time points, complicating the analysis. An example of biological time series data is gene expression data, where the relative abundances of all genes are recorded over multiple minutes, hours, days, or weeks.</p>
+<p>One property of a good clustering method for time series data is that it groups similar temporal shapes. Similarity in expression patterns may correspond to similarity in biological function, which helps aid in the direction of future research. Lag Penalized Weighted Correlation (LPWC) is a distance-based clustering algorithm that builds upon weighted correlation. LPWC aligns time series data to accommodate lags, allowing two entities (for example, genes) that exhibit similar temporal behaviors that are not perfectly synchronized to be clustered together. Lags are penalized using a Gaussian kernel so that synchronized temporal patterns are preferred over lagged patterns. Unlike many other clustering approaches, LPWC also accounts for irregular time sampling in which there are non-uniform intervals between timepoints.</p>
+<p>If you use LPWC in published research, please cite our preprint:</p>
+<p>Lag Penalized Weighted Correlation for Time Series Clustering. Thevaa Chandereng, Anthony Gitter. bioRxiv 2018. <a href="https://doi.org/10.1101/292615">doi:10.1101/292615</a></p>
+<p>If after reading through this vignette you have questions or problems using LPWC, please post them to <a href="https://github.com/gitter-lab/LPWC/issues" class="uri">https://github.com/gitter-lab/LPWC/issues</a>. This will notify the package maintainers and benefit other users.</p>
+<p>You should <strong>not</strong> email your question to the package authors, as we will just reply that the question should be posted to the <strong>Github support site</strong>.</p>
+</div>
+<div id="running-lpwc" class="section level1">
+<h1>Running LPWC</h1>
+<p>Prior to analyzing your data, the R package needs to be installed.</p>
+<p>Because the package is not yet published on Bioconductor or CRAN, the best way to download the R package is through GitHub.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(devtools)
+devtools::<span class="kw">install_github</span>(<span class="st">&quot;gitter-lab/LPWC&quot;</span>)</code></pre></div>
+<p>After successful installation, the package must be loaded into the working space:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(LPWC)</code></pre></div>
+<div id="required-input" class="section level2">
+<h2>Required input</h2>
+<p><strong>Data :</strong> Input to LPWC is a matrix. We assume here that it is a gene expression matrix, but other data types are suitable as well. The expression matrix should be n -by- p where n is the number of genes (in rows) and p is the number of timepoints.</p>
+<p>The object <strong>simdata</strong> is a simulated dataset for 200 genes with 8 timepoints that follow the biological <a href="https://doi.org/10.1093/bioinformatics/btw665">impulse model</a>. This is stored as a matrix.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(simdata)
+simdata[<span class="dv">1</span>:<span class="dv">5</span>, ]
+<span class="co">#&gt;           Time_ 1   Time_ 2   Time_ 3   Time_ 4  Time_ 5  Time_ 6  Time_ 7</span>
+<span class="co">#&gt; Gene_ 1 13.180777 17.125143 15.770959 16.541127 22.20278 29.60190 30.59476</span>
+<span class="co">#&gt; Gene_ 2 24.022276 23.549481 20.717807 30.725417 39.31060 33.87521 36.15077</span>
+<span class="co">#&gt; Gene_ 3 13.808949 15.585296 14.682402 22.498271 28.18709 28.53901 27.99949</span>
+<span class="co">#&gt; Gene_ 4  9.527839  6.639082  8.841857  9.724606 18.98756 22.94803 24.47678</span>
+<span class="co">#&gt; Gene_ 5 13.682422 10.835738 18.088811 20.666888 26.19007 25.95533 26.82196</span>
+<span class="co">#&gt;          Time_ 8  Time_ 9 Time_ 10</span>
+<span class="co">#&gt; Gene_ 1 31.43318 20.22925 18.89403</span>
+<span class="co">#&gt; Gene_ 2 35.95496 29.87581 29.61810</span>
+<span class="co">#&gt; Gene_ 3 34.25247 23.11201 26.29722</span>
+<span class="co">#&gt; Gene_ 4 26.75902 19.61690 21.17882</span>
+<span class="co">#&gt; Gene_ 5 24.18250 21.13418 19.65256</span>
+<span class="kw">str</span>(simdata)
+<span class="co">#&gt; 'data.frame':    200 obs. of  10 variables:</span>
+<span class="co">#&gt;  $ Time_ 1 : num  13.18 24.02 13.81 9.53 13.68 ...</span>
+<span class="co">#&gt;  $ Time_ 2 : num  17.13 23.55 15.59 6.64 10.84 ...</span>
+<span class="co">#&gt;  $ Time_ 3 : num  15.77 20.72 14.68 8.84 18.09 ...</span>
+<span class="co">#&gt;  $ Time_ 4 : num  16.54 30.73 22.5 9.72 20.67 ...</span>
+<span class="co">#&gt;  $ Time_ 5 : num  22.2 39.3 28.2 19 26.2 ...</span>
+<span class="co">#&gt;  $ Time_ 6 : num  29.6 33.9 28.5 22.9 26 ...</span>
+<span class="co">#&gt;  $ Time_ 7 : num  30.6 36.2 28 24.5 26.8 ...</span>
+<span class="co">#&gt;  $ Time_ 8 : num  31.4 36 34.3 26.8 24.2 ...</span>
+<span class="co">#&gt;  $ Time_ 9 : num  20.2 29.9 23.1 19.6 21.1 ...</span>
+<span class="co">#&gt;  $ Time_ 10: num  18.9 29.6 26.3 21.2 19.7 ...</span></code></pre></div>
+<p><strong>Timepoints:</strong> The object <strong>timepoints</strong> should be a vector of timepoints that specify when the data were collected. This should match the column length in <strong>Data</strong>. This can be in any form (seconds, minutes, hours, or even days), but make sure the units are uniform throughout.</p>
+<p>The timepoints used in <strong>Data</strong> are</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">timepoints &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">6</span>, <span class="dv">8</span>, <span class="dv">18</span>, <span class="dv">24</span>, <span class="dv">32</span>, <span class="dv">48</span>, <span class="dv">72</span>)
+timepoints
+<span class="co">#&gt;  [1]  0  2  4  6  8 18 24 32 48 72</span></code></pre></div>
+<p><strong>Data</strong> and <strong>Timepoints</strong> are the main requirement to run LPWC, however, there are other optional parameters that affect the results. Our manuscript referenced above describes these parameters in more detail.</p>
+<p><strong>Max.lag:</strong> The object <strong>max.lag</strong> should be an integer value that controls the maximum lag. This max.lag has to be less than the floor of length(timepoints) / 4. That is because longer lags lead to comparisons between two expression profiles that use less than half of the data points, which can lead to spurious correlations.</p>
+<p><strong>C:</strong> The object <strong>C</strong> should be a numeric. This controls the width of the Gaussian kernel function used to penalize the lag and the weights in weighed correlation vector. The parameter <strong>C</strong> can be set automatically by setting <strong>C</strong> to the default NULL value and setting the <strong>penalty</strong> argument described below. If <strong>C</strong> is set to a specific value, the <strong>penalty</strong> is ignored.</p>
+<p><strong>penalty:</strong> The object <strong>penalty</strong> only allows two values: “low” and “high”. It is used to automatically set the value of <strong>C</strong>. High imposes a higher penalty on lags thus favoring grouping genes without introducing lags. The lower penalty leads to more lagged genes in the clusters. The default is set to the “high” penalty. This argument is ignored if <strong>C</strong> is set to a specific value.</p>
+<p><strong>iter:</strong> The object <strong>iter</strong> should be a numeric. This controls the number of values of C that are tested when automatically setting the C parameter. The default is 10. Increasing iter increases computational time. This is only relevant for the low penalty because the high penalty uses a single C instead of searching over multiple C.</p>
+</div>
+<div id="obtaining-gene-gene-similarities" class="section level2">
+<h2>Obtaining gene-gene similarities</h2>
+<p>LPWC computes similarity (an adjusted weighted correlation) between genes and returns three outputs: correlation of genes in dist form (see as.dist), the best lag used for each gene, and the C used.</p>
+<p>An example output of LPWC for 10 genes using high penalty follows:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">LPWC::<span class="kw">corr.bestlag</span>(simdata[<span class="dv">49</span>:<span class="dv">58</span>, ], <span class="dt">timepoints =</span> timepoints, <span class="dt">max.lag =</span> <span class="dv">2</span>, <span class="dt">penalty =</span> <span class="st">&quot;high&quot;</span>, <span class="dt">iter =</span> <span class="dv">10</span>)
+<span class="co">#&gt; $corr</span>
+<span class="co">#&gt;               1            2            3            4            5</span>
+<span class="co">#&gt; 2   0.851923851                                                    </span>
+<span class="co">#&gt; 3  -0.218237490  0.185296315                                       </span>
+<span class="co">#&gt; 4  -0.503013415 -0.185206626  0.820661318                          </span>
+<span class="co">#&gt; 5  -0.459664840 -0.098109602  0.846568127  0.902530166             </span>
+<span class="co">#&gt; 6  -0.299615918  0.147669259  0.942905074  0.707652473  0.725611385</span>
+<span class="co">#&gt; 7  -0.324090620  0.008691392  0.801844343  0.827065718  0.783988169</span>
+<span class="co">#&gt; 8  -0.311218630  0.145879675  0.958900623  0.806729108  0.821231416</span>
+<span class="co">#&gt; 9  -0.177943816  0.183155731  0.818514482  0.584610971  0.733599647</span>
+<span class="co">#&gt; 10 -0.412958564  0.050367297  0.943102621  0.773563872  0.818502367</span>
+<span class="co">#&gt;               6            7            8            9</span>
+<span class="co">#&gt; 2                                                     </span>
+<span class="co">#&gt; 3                                                     </span>
+<span class="co">#&gt; 4                                                     </span>
+<span class="co">#&gt; 5                                                     </span>
+<span class="co">#&gt; 6                                                     </span>
+<span class="co">#&gt; 7   0.686430019                                       </span>
+<span class="co">#&gt; 8   0.961429975  0.712528238                          </span>
+<span class="co">#&gt; 9   0.803809413  0.756633891  0.740717669             </span>
+<span class="co">#&gt; 10  0.951300777  0.727622247  0.937457260  0.748985339</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $lags</span>
+<span class="co">#&gt;  [1] 0 1 0 0 0 0 0 0 0 0</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $C</span>
+<span class="co">#&gt; [1] 306.2401</span></code></pre></div>
+<p>However, many clustering algorithms, such as hierarchical clustering, take distances as input instead of similarities. We convert the similarities to distances by subtracting the similarities from 1. Initially</p>
+<p><span class="math display">\[ -1 \leq Corr \leq 1\]</span></p>
+<p>When we take Dist = 1 - Corr</p>
+<p><span class="math display">\[ 0 \leq Dist = (1 - Corr) \leq 2\]</span></p>
+</div>
+<div id="generating-clusters-using-hierarchical-clustering" class="section level2">
+<h2>Generating clusters using hierarchical clustering</h2>
+<p>LPWC computes a similarity matrix and does not directly cluster the genes. A standard similarity-based clustering algorithm such as hierarchical clustering can be applied to the LPWC similarities.</p>
+<p>An example for 10 genes:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dist &lt;-<span class="st"> </span><span class="dv">1</span> -<span class="st"> </span>LPWC::<span class="kw">corr.bestlag</span>(simdata[<span class="dv">11</span>:<span class="dv">20</span>, ], <span class="dt">timepoints =</span> timepoints, <span class="dt">max.lag =</span> <span class="dv">2</span>, <span class="dt">penalty =</span> <span class="st">&quot;low&quot;</span>, <span class="dt">iter =</span> <span class="dv">10</span>)$corr
+<span class="kw">plot</span>(<span class="kw">hclust</span>(dist))</code></pre></div>
+<p><img src="data:image/png;base64,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N51NJgESIAESCJ8AFXD494A1IAESIAESyEICVMBZeNPZZBIgARIggfAJUAGHfw9YAxIgARIggSwkQAWchTedTSYBEiABEgifABVw+PeANSABEiABEshCAlTAWXjT2WQSIAESIIHwCVABh38PWAMSIAESIIEsJEAFnIU3nU0mARIgARIIn0DR8KuQWTWYOXOmjBgxImmlli1bJiNHjpRWrVolTcsEJEACJEACJBBPgAo4jkjNmjWle/fucUdz7vbt21eKFo0evtGjR8usWbOkUKFCORvFIyQQEQL79u2Tzp07S9u2bSNSY1aTBHISKGQZyXmYR5IRaNy4sQwfPlxOP/30ZEkz6jwU73PPPSfFixfPqHqxMiSQFwK7du1SS9WSJUvychnTkkBGEYheFy6j8EWvMuXLl5cLLrhAKlSoEL3Ks8Yk8BeBhQsXykEHHUQeJBBpAnTCivTtY+VJgARIgASiSoAKOKp3jvUmARIgARKINAEq4EjfPlaeBEiABEggqgSogKN651hvEiABEiCBSBOgAo707WPlSYAESIAEokqACjiqd471JgESIAESiDQBKuBI3z5WngRIgARIIKoEOA84qneO9SaBAAns2LFDOnXqJH/++WeAuaYuq927d8tPP/0kF154YeoKCTDn/fv3S4sWLaRPnz4B5sqsok6ACjjqd5D1J4EACMydO1fmzJkjEyZMCCA3ZhFPAKEzb7jhBirgeDBZvk8FnOU/ADafBGwCTZs2jUyP0q5zVL43bNjAyF1RuVlprGfkFTBCWW/ZskWKFCkihx9+eL7Rfffdd7Jo0aKk+Wzbtk127tyZNB0TkAAJkAAJkIAXgUgq4B9++EEee+wxmThxomD7999/17aVLl1aqlatKuedd54MGjRISpUq5dXmXI+tWrVKnn322VzT4OTmzZtl+/btSdMxAQmQAAmQAAl4EYicAl63bp3AVIZVfa644gqpXr269nyxj17p2rVrZdKkSTJ58mTB2r41atTwanfCY82bNxd8kglWQ6pSpUqyZDxPAiRAAiRAAp4EIqeAhw4dqr3cGTNmJBxTGTJkiLRq1UrGjx+vPWHPlvMgCZAACZAACYRIIHLzgBcvXizXXnttQuULlsWKFZMuXbrIe++9FyJaFk0CJEACJEACiQlETgE3adJE5s2bl7hFf5354IMP5Oijj06ajglIgARI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QAKBEaACDgwlMyIBEiABEiAB/wSogP2zYkoSIAESIAESCIwAFXBgKJkRCZAACZAACfgnQAXsnxVTkgAJkAAJkEBgBKiAA0PJjEiABEiABEjAPwEqYP+smJIESIAESIAEAiNABRwYSmZEAiRAAiRAAv4JUAH7Z8WUJEACJEACJBAYASrgwFAyIxIgARIgARLwT4AK2D8rpiQBEiABEiCBwAhQAQeGkhmRAAmQAAmQgH8CVMD+WTElCZAACZAACQRGgAo4MJTMiARIgARIgAT8E6AC9s+KKUmABEiABEggMAJUwIGhZEYkQAIkQAIk4J8AFbB/VkxJAiRAAiRAAoERoAIODCUzIgESIAESIAH/BKiA/bNiShIgARIgARIIjAAVcGAomREJkAAJkAAJ+CdABeyfFVOSAAmQAAmQQGAEqIADQ8mMSIAESIAESMA/ASpg/6yYkgRIgARIgAQCI0AFHBhKZkQCJEACJEAC/glQAftnxZQkQAIkQAIkEBgBKuDAUDIjEiABEiABEvBPgArYPyumJAESIAESIIHACFABB4aSGZEACZAACZCAfwJUwP5ZMSUJkAAJkAAJBEaACjgwlMyIBKJBoEiRIjJ69Git7A033CD169f3XfEtW7bIc8895zs9E5IACSQmUDTxKZ4hARIo6AQaN24slSpV8t3MHj16yJ49e6Rz586+r2FCEiABbwJUwN5ceJQEsoLAddddl6d2/vnnn1KoUKE8XcPEJEAC3gRogvbmwqMkUCAIfPvtt9K1a1epWLGimpqnTZsW067BgwfLNddc4xxbsGCBNGvWTA499FCpVq2adOnSRbZt26bne/XqJbNnz5aPPvpIGjRoIBs3bnSu4wYJkEDeCbAHnHdmvIIEIkHgt99+k3bt2sn+/ftl1KhRsmnTJunYsaOgF2vLunXrZPny5br7yy+/SOvWraVRo0YyduxY+emnnwQKGte8++670rZtW5k/f778/vvv0rt3byldurSdDb9JgAQOgAAV8AFA4yUkEAUCUKJffvmlrFmzRipXrqxVPvzww6VDhw6e1V+6dKls3bpV/vnPf8qpp56qaY466iiZN2+eWJYlzZs3lypVqggUe6dOnTzz4EESIAH/BKiA/bNiShKIFIHFixer2dlWvqj85ZdfLoULe488nXTSSVKqVCm57LLLpFu3bnLxxRfLpZdeqp9I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" /><!-- --></p>
+<p>The genes can also be assigned to clusters using cutree function. An example of cluster assignment with 3 clusters:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dist &lt;-<span class="st"> </span><span class="dv">1</span> -<span class="st"> </span>LPWC::<span class="kw">corr.bestlag</span>(simdata[<span class="dv">11</span>:<span class="dv">20</span>, ], <span class="dt">timepoints =</span> timepoints, <span class="dt">max.lag =</span> <span class="dv">2</span>, <span class="dt">penalty =</span> <span class="st">&quot;low&quot;</span>, <span class="dt">iter =</span> <span class="dv">10</span>)$corr
+<span class="kw">cutree</span>(<span class="kw">hclust</span>(dist), <span class="dt">k =</span> <span class="dv">3</span>)
+<span class="co">#&gt;  [1] 1 2 3 2 3 3 2 2 3 1</span></code></pre></div>
+</div>
+</div>
+<div id="contributors" class="section level1">
+<h1>Contributors</h1>
+<p>Our development of LPWC benefited from help and feedback from many individuals, including but not limited to:</p>
+<p>Wenzhi Cao, Jen Birstler, James Dowell, Ron Stewart, Gitter Lab members.</p>
+</div>
+<div id="session-info" class="section level1">
+<h1>Session info</h1>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sessionInfo</span>()
+<span class="co">#&gt; R version 3.4.3 (2017-11-30)</span>
+<span class="co">#&gt; Platform: x86_64-apple-darwin15.6.0 (64-bit)</span>
+<span class="co">#&gt; Running under: OS X El Capitan 10.11.4</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Matrix products: default</span>
+<span class="co">#&gt; BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib</span>
+<span class="co">#&gt; LAPACK: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRlapack.dylib</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; locale:</span>
+<span class="co">#&gt; [1] C/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; attached base packages:</span>
+<span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; other attached packages:</span>
+<span class="co">#&gt; [1] LPWC_0.99.2</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; loaded via a namespace (and not attached):</span>
+<span class="co">#&gt;  [1] compiler_3.4.3  backports_1.1.2 magrittr_1.5    rprojroot_1.3-2</span>
+<span class="co">#&gt;  [5] htmltools_0.3.6 tools_3.4.3     yaml_2.1.18     Rcpp_0.12.16   </span>
+<span class="co">#&gt;  [9] stringi_1.1.7   rmarkdown_1.9   knitr_1.20      stringr_1.3.0  </span>
+<span class="co">#&gt; [13] digest_0.6.15   evaluate_0.10.1</span></code></pre></div>
+</div>
+<div id="faq" class="section level1">
+<h1>FAQ</h1>
+<ul>
+<li>How can I speed up LPWC for the low penalty with a large dataset?</li>
+</ul>
+<p>We recommend parallelizing parts of the analysis, as shown below:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+
+<span class="co"># This function stores two different list separately </span>
+comb &lt;-<span class="st"> </span>function(x, ...) {
+  <span class="kw">lapply</span>(<span class="kw">seq_along</span>(x),
+         function(i) <span class="kw">c</span>(x[[i]], <span class="kw">lapply</span>(<span class="kw">list</span>(...), function(y) y[[i]])))
+}
+
+
+<span class="co"># adding the data</span>
+data &lt;-<span class="st"> </span>simdata[<span class="dv">1</span>:<span class="dv">10</span>, ]
+<span class="co"># number of iterations</span>
+iter &lt;-<span class="st"> </span><span class="dv">10</span>
+<span class="co"># C values that are used in the algorithm</span>
+allC &lt;-<span class="st"> </span><span class="kw">findC</span>(<span class="dt">timepoints =</span> timepoints, <span class="dt">iter =</span> iter)
+
+<span class="co"># setting the clusters </span>
+core &lt;-<span class="st"> </span>parallel::<span class="kw">detectCores</span>() -<span class="st"> </span><span class="dv">1</span>
+cl &lt;-<span class="st"> </span>parallel::<span class="kw">makeCluster</span>(core)
+
+<span class="co"># assigning the parallelization</span>
+doParallel::<span class="kw">registerDoParallel</span>(cl)
+
+
+## running the algorithm for different C 
+result &lt;-<span class="st"> </span><span class="kw">foreach</span>(<span class="dt">i =</span> <span class="dv">1</span>:iter, <span class="dt">.combine=</span><span class="st">'comb'</span>, <span class="dt">.multicombine=</span><span class="ot">TRUE</span>,
+                <span class="dt">.init=</span><span class="kw">list</span>(<span class="kw">list</span>(), <span class="kw">list</span>())) %dopar%<span class="st"> </span>{
+            lags &lt;-<span class="st"> </span><span class="kw">best.lag</span>(data, <span class="dt">max.lag =</span> <span class="dv">3</span>, <span class="dt">timepoints =</span> timepoints, <span class="dt">C =</span> allC[i])
+            new.data &lt;-<span class="st"> </span><span class="kw">prep.data</span>(<span class="dt">data =</span> data, <span class="dt">lags =</span> lags, <span class="dt">timepoints =</span> timepoints)
+            corr &lt;-<span class="st"> </span><span class="kw">comp.corr</span>(new.data$data, new.data$time, <span class="dt">C =</span> allC[i])
+            <span class="kw">return</span>(<span class="kw">list</span>(corr, lags))
+                }
+
+
+<span class="co"># dividing the list into two different list: one for lags and one for all the correlations</span>
+allcorr &lt;-<span class="st"> </span>result[[<span class="dv">1</span>]]
+alllags &lt;-<span class="st"> </span>result[[<span class="dv">2</span>]]
+
+<span class="co"># picking best C</span>
+val &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="ot">NA</span>, (<span class="kw">length</span>(iter) -<span class="st"> </span><span class="dv">1</span>))
+for(i in <span class="dv">1</span>:(iter -<span class="st"> </span><span class="dv">1</span>)){
+  val[i] &lt;-<span class="st"> </span><span class="kw">sum</span>((<span class="kw">as.vector</span>(allcorr[[i +<span class="st"> </span><span class="dv">1</span>]]) -<span class="st"> </span><span class="kw">as.vector</span>(allcorr[[i]]))^<span class="dv">2</span>)
+}
+
+<span class="co"># returning the results for the best C</span>
+result &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">corr =</span> allcorr[[<span class="kw">which.min</span>(val) +<span class="st"> </span><span class="dv">1</span>]], <span class="dt">lags =</span> alllags[[<span class="kw">which.min</span>(val) +<span class="st"> </span><span class="dv">1</span>]], <span class="dt">C =</span> values[<span class="kw">which.min</span>(val) +<span class="st"> </span><span class="dv">1</span>])</code></pre></div>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

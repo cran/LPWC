@@ -47,12 +47,28 @@ just reply that the question should be posted to the
 
 Prior to analyzing your data, the R package needs to be installed.
 
-Because the package is not yet published on Bioconductor or CRAN, the best way to download the R package is through GitHub.
+The easiest way to install LPWC is through CRAN:
+```{r, eval = FALSE}
+install.packages("LPWC")
+```
 
-```{r install, results='asis', eval=FALSE}
-library(devtools)
+
+There are other additional ways to download LPWC.
+The first option is most useful if want to download a specific version of LPWC
+(which can be found at https://github.com/gitter-lab/LPWC/releases).
+```{r, eval = FALSE}
+devtools::install_github("gitter-lab/LPWC@vx.xx.x")
+#OR 
+devtools::install_version("LPWC", version = "x.x.x", repos = "http://cran.us.r-project.org")
+```
+
+
+The second option is to download through GitHub. 
+
+```{r, results='asis', eval=FALSE}
 devtools::install_github("gitter-lab/LPWC")
 ```
+
 
 After successful installation, the package must be loaded into the working space:
 
@@ -64,7 +80,7 @@ library(LPWC)
 
 ## Required input
 
-**Data :**  Input to LPWC is a matrix.
+**Data**:  Input to LPWC is a matrix.
 We assume here that it is a gene expression matrix, but other data types are suitable as well.
 The expression matrix should be n -by- p where n is the number of genes (in rows) and p is the number of timepoints.
 
@@ -84,7 +100,7 @@ str(simdata)
 **Timepoints:** The object **timepoints** should be a vector of timepoints that specify when the data were collected.
 This should match the column length in **Data**. This can be in any form (seconds, minutes, hours, or even days), but make sure the units are uniform throughout.
 
-The timepoints used in **Data** are
+The timepoints used in the example **simdata** are
 ```{r time}
 timepoints <- c(0, 2, 4, 6, 8, 18, 24, 32, 48, 72)
 timepoints
@@ -116,10 +132,78 @@ The default is 10.
 Increasing iter increases computational time.
 This is only relevant for the low penalty because the high penalty uses a single C instead of searching over multiple C.
 
+## Interpreting lags
+
+Lags are taken with respect to the original timepoints vector.
+Lags can be positive or negative integers and specify the number of indices to shift the timepoints.
+The examples below demonstrate applying different lags to genes 1 and 2. 
+
+
+```{r, echo = FALSE, fig.height = 2, fig.width=4, warning = FALSE, fig.align='center'}
+library(ggplot2)
+
+set.seed(29876)
+
+
+a <- rbind(c(rep(0, 5), 8, 0), c(rep(0, 4), 4.3, 0, 0)) + rnorm(2, 0, 0.5)
+
+dat <- data.frame(intensity = as.vector(a), time = rep(c(0, 5, 15, 30, 45, 60, 75), each = 2), genes = factor(rep(c(1, 2), 7)))
+
+a2 <- a
+a2[1, ] <- c(a2[1, 2:7], NA)
+dat2 <- data.frame(intensity = as.vector(a2), time = rep(c(0, 5, 15, 30, 45, 60, 75), each = 2), genes = factor(rep(c(1, 2), 7)))
+
+a3 <- a
+a3[2, ] <- c(NA, a3[2, 1:6])
+a3[1, ] <- c(a3[1, 2:7], NA)
+dat3 <- data.frame(intensity = as.vector(a3), time = rep(c(0, 5, 15, 30, 45, 60, 75), each = 2), genes = factor(rep(c(1, 2), 7)))
+
+
+plot1 <- ggplot(dat, aes(x= time, y = intensity, group = genes)) + geom_line(aes(color = genes), size = 1.5) +  labs(x = "Time (min)") + labs(y = "Intensity") 
+plot1
+
+row1 <- c(0, 5, 15, 30, 45, 60, 75)
+knitr::kable(t(data.frame(Original = row1, Gene1 = row1, Gene2 = row1)), align = 'c')
+
+
+
+
+```
+
+```{r, echo = FALSE, fig.height = 2, fig.width=4, warning = FALSE, fig.align='center'}
+
+plot2 <- ggplot(dat2, aes(x= time, y = intensity, group = genes)) + geom_line(aes(color = genes), size = 1.5) + 
+  labs(x = "Time (min)") + labs(y = "Intensity") 
+plot2
+
+row2 <- c(5, 15, 30, 45, 60, 75, "-")
+
+knitr::kable(t(data.frame(Original = row1, Gene1 = row2, Gene2 = row1)), align = 'c')
+
+```
+
+
+```{r, echo = FALSE, fig.height = 2, fig.width=4, warning = FALSE, fig.align='center'}
+
+plot3 <- ggplot(dat3, aes(x= time, y = intensity, group = genes)) + geom_line(aes(color = genes), size = 1.5) + 
+  labs(x = "Time (min)") + labs(y = "Intensity") 
+plot3
+
+row3 <- c("-", 0, 5, 15, 30, 45, 60)
+
+knitr::kable(t(data.frame(Original = row1, Gene1 = row2, Gene2 = row3)), align = 'c')
+
+```
+
+The time series plots show aligned expression vectors, and the tables show the aligned timepoints.
+With no lags, the temporal profiles of genes 1 and 2 are not aligned so the gene pair will have a low LPWC similarity score (top row).
+When gene 1 has a lag of -1, the patterns are aligned, and the LPWC similarity score will be high (middle row).
+Finally, when gene 1 has a lag of -1 and gene 2 has a lag of 1, the temporal shapes are once again not aligned.
+In this case, the LPWC similarity score will be even lower than in the no lag case because the penalty for introducing lags is applied (bottom row).
 
 ## Obtaining gene-gene similarities
 
-LPWC computes similarity (an adjusted weighted correlation) between genes and returns three outputs: correlation of genes in dist form (see as.dist), the best lag used for each gene, and the C used.
+LPWC computes similarity (an adjusted weighted correlation) between genes and returns three outputs: correlation of genes in dist form (see as.dist), the best lag used for each gene, and the C used. The lags introduced are in reference to the original time points (i.e. lag of 0). 
 
 
 An example output of LPWC for 10 genes using high penalty follows:
@@ -169,9 +253,11 @@ Our development of LPWC benefited from help and
 feedback from many individuals, including but not limited to:
 
 Wenzhi Cao,
+Karl Broman, 
 Jen Birstler,
 James Dowell,
 Ron Stewart,
+leungi (Github user), 
 Gitter Lab members.
 
 

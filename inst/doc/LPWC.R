@@ -1,8 +1,15 @@
 ## ----setup, echo=FALSE, results="hide"-----------------------------------
 knitr::opts_chunk$set(comment = "#>", collapse = TRUE)
 
-## ----install, results='asis', eval=FALSE---------------------------------
-#  library(devtools)
+## ---- eval = FALSE-------------------------------------------------------
+#  install.packages("LPWC")
+
+## ---- eval = FALSE-------------------------------------------------------
+#  devtools::install_github("gitter-lab/LPWC@vx.xx.x")
+#  #OR
+#  devtools::install_version("LPWC", version = "x.x.x", repos = "http://cran.us.r-project.org")
+
+## ---- results='asis', eval=FALSE-----------------------------------------
 #  devtools::install_github("gitter-lab/LPWC")
 
 ## ----lib, results="asis", eval=TRUE--------------------------------------
@@ -16,6 +23,58 @@ str(simdata)
 ## ----time----------------------------------------------------------------
 timepoints <- c(0, 2, 4, 6, 8, 18, 24, 32, 48, 72)
 timepoints
+
+## ---- echo = FALSE, fig.height = 2, fig.width=4, warning = FALSE, fig.align='center'----
+library(ggplot2)
+
+set.seed(29876)
+
+
+a <- rbind(c(rep(0, 5), 8, 0), c(rep(0, 4), 4.3, 0, 0)) + rnorm(2, 0, 0.5)
+
+dat <- data.frame(intensity = as.vector(a), time = rep(c(0, 5, 15, 30, 45, 60, 75), each = 2), genes = factor(rep(c(1, 2), 7)))
+
+a2 <- a
+a2[1, ] <- c(a2[1, 2:7], NA)
+dat2 <- data.frame(intensity = as.vector(a2), time = rep(c(0, 5, 15, 30, 45, 60, 75), each = 2), genes = factor(rep(c(1, 2), 7)))
+
+a3 <- a
+a3[2, ] <- c(NA, a3[2, 1:6])
+a3[1, ] <- c(a3[1, 2:7], NA)
+dat3 <- data.frame(intensity = as.vector(a3), time = rep(c(0, 5, 15, 30, 45, 60, 75), each = 2), genes = factor(rep(c(1, 2), 7)))
+
+
+plot1 <- ggplot(dat, aes(x= time, y = intensity, group = genes)) + geom_line(aes(color = genes), size = 1.5) +  labs(x = "Time (min)") + labs(y = "Intensity") 
+plot1
+
+row1 <- c(0, 5, 15, 30, 45, 60, 75)
+knitr::kable(t(data.frame(Original = row1, Gene1 = row1, Gene2 = row1)), align = 'c')
+
+
+
+
+
+## ---- echo = FALSE, fig.height = 2, fig.width=4, warning = FALSE, fig.align='center'----
+
+plot2 <- ggplot(dat2, aes(x= time, y = intensity, group = genes)) + geom_line(aes(color = genes), size = 1.5) + 
+  labs(x = "Time (min)") + labs(y = "Intensity") 
+plot2
+
+row2 <- c(5, 15, 30, 45, 60, 75, "-")
+
+knitr::kable(t(data.frame(Original = row1, Gene1 = row2, Gene2 = row1)), align = 'c')
+
+
+## ---- echo = FALSE, fig.height = 2, fig.width=4, warning = FALSE, fig.align='center'----
+
+plot3 <- ggplot(dat3, aes(x= time, y = intensity, group = genes)) + geom_line(aes(color = genes), size = 1.5) + 
+  labs(x = "Time (min)") + labs(y = "Intensity") 
+plot3
+
+row3 <- c("-", 0, 5, 15, 30, 45, 60)
+
+knitr::kable(t(data.frame(Original = row1, Gene1 = row2, Gene2 = row3)), align = 'c')
+
 
 ## ------------------------------------------------------------------------
 LPWC::corr.bestlag(simdata[49:58, ], timepoints = timepoints, max.lag = 2, penalty = "high", iter = 10)

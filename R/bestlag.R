@@ -1,6 +1,7 @@
 #' Best Lag
 #'
-#' This function computes the best lags for a dataset using weighted correlation
+#' This function computes the best lags for a dataset using weighted correlation.
+#' The lags obtained are in reference to the original timepoints.
 #'
 #' @param data a matrix with rows representing genes and columns
 #' representing different timepoints
@@ -10,7 +11,7 @@
 #' @param C a numeric value of C used in computing weighted correlation
 #' @return a vector of best lags used in the dataset, one per gene
 #'
-#' @example best.lag(array(rnorm(20), c(5, 4)), timepoints = c(0, 5, 10,
+#' @example best.lag(array(rnorm(20), c(4, 5)), timepoints = c(0, 5, 10,
 #'          20, 40), C = 300)
 #'
 #' @author Thevaa Chandereng, Anthony Gitter

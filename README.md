@@ -5,7 +5,7 @@
 [![Download badge](https://cranlogs.r-pkg.org/badges/LPWC)](https://cran.r-project.org/package=LPWC)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![codecov](https://codecov.io/gh/gitter-lab/LPWC/branch/master/graph/badge.svg)](https://codecov.io/gh/gitter-lab/LPWC)
-[![Build status](https://ci.appveyor.com/api/projects/status/9xtm9s42awiir55r?svg=true)](https://ci.appveyor.com/project/agitter/lpwc)
+[![Build status](https://ci.appveyor.com/api/projects/status/851q74xh2ue87tid?svg=true)](https://ci.appveyor.com/project/gitter-lab/lpwc)
 
 **Authors**: Thevaa Chandereng and Anthony Gitter
 
@@ -17,6 +17,7 @@ It is designed to identify groups of biological entities (for example, genes or 
 LPWC allows lags to incorporate delayed responses in the biological data.
 For example, two genes may have similar expression changes over time, but one initiates those changes 5 minutes after the other.
 LPWC also supports irregular time intervals between time points collected in biological data.
+The LPWC website is available [here](https://gitter-lab.github.io/LPWC/). 
 
 Installation
 ------------
@@ -51,7 +52,8 @@ library(LPWC)
 
 Usage
 ------------
-See the vignette for usage instructions.
+See the [vignette](https://gitter-lab.github.io/LPWC/articles/LPWC.html) for usage instructions.
+
 
 Reference
 ------------

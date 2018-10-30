@@ -9,8 +9,8 @@ knitr::opts_chunk$set(comment = "#>", collapse = TRUE)
 #  #OR
 #  devtools::install_version("LPWC", version = "x.x.x", repos = "http://cran.us.r-project.org")
 
-## ---- results='asis', eval=FALSE-----------------------------------------
-#  devtools::install_github("gitter-lab/LPWC")
+## ---- results='asis'-----------------------------------------------------
+devtools::install_github("gitter-lab/LPWC")
 
 ## ----lib, results="asis", eval=TRUE--------------------------------------
 library(LPWC)
@@ -86,6 +86,10 @@ plot(hclust(dist))
 ## ----clust 2-------------------------------------------------------------
 dist <- 1 - LPWC::corr.bestlag(simdata[11:20, ], timepoints = timepoints, max.lag = 2, penalty = "low", iter = 10)$corr
 cutree(hclust(dist), k = 3)
+
+## ---- eval = FALSE-------------------------------------------------------
+#  indexnon0 <- apply(data, 1, function(x){which(var(x) != 0)})
+#  subset.data <- data[indexnon0, ]
 
 ## ----sessionInfo---------------------------------------------------------
 sessionInfo()

@@ -7,8 +7,9 @@
 prep.data(data, lags, timepoints)
 }
 \arguments{
-\item{data}{a matrix with rows representing genes and columns representing
-different timepoints}
+\item{data}{a matrix or data frame with rows representing genes and columns
+representing different timepoints. If data is a data frame, the gene names
+can be specified using the \code{row.names()}.}
 
 \item{lags}{a vector of same length as the number of rows in the data column
 indicating the best lags}
@@ -25,7 +26,8 @@ This function prepares the data to compute correlation by introducing NA's when 
 \examples{
 prep.data(array(rnorm(20), c(5, 4)), c(0, 0, 0, -1, 1),
           timepoints = c(0, 5, 15, 30))
-
+prep.data(array(runif(100, 0, 10), c(10, 10)), sample((-2:2), size = 10, replace = TRUE),
+          timepoints = c(0, 5, 15, 30, 45, 60, 75, 80, 100, 120))
 
 }
 \author{

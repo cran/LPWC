@@ -7,8 +7,9 @@
 best.lag(data, timepoints, max.lag = NULL, C)
 }
 \arguments{
-\item{data}{a matrix with rows representing genes and columns
-representing different timepoints}
+\item{data}{a matrix or data frame with rows representing genes and columns
+representing different timepoints. If data is a data frame, the gene names
+can be specified using the \code{row.names()}.}
 
 \item{timepoints}{a vector of time points used in the dataset}
 
@@ -21,8 +22,15 @@ defaults to the floor of the number of timepoints divided by 4}
 a vector of best lags used in the dataset, one per gene
 }
 \description{
-This function computes the best lags for a dataset using weighted correlation.
+\code{best.lag} computes the best lags for a dataset using weighted correlation.
 The lags obtained are in reference to the original timepoints.
+}
+\examples{
+best.lag(data = array(rnorm(20), c(4, 5)), timepoints = c(0, 5, 10, 20, 40), C = 300)
+best.lag(data = array(runif(100), c(5, 20)), timepoints = seq(2, 40, 2), C = 10)
+best.lag(data = array(runif(100), c(5, 20)), timepoints = seq(2, 40, 2), max.lag = 2, C = 10)
+
+
 }
 \author{
 Thevaa Chandereng, Anthony Gitter

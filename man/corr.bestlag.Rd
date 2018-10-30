@@ -4,11 +4,13 @@
 \alias{corr.bestlag}
 \title{Computes best lag correlation}
 \usage{
-corr.bestlag(data, timepoints, max.lag = NULL, C = NULL, penalty = "high",
-  iter = 10)
+corr.bestlag(data, timepoints, max.lag = NULL, C = NULL,
+  penalty = "high", iter = 10)
 }
 \arguments{
-\item{data}{a matrix with rows representing genes and columns representing different timepoints}
+\item{data}{a matrix or data frame with rows representing genes and columns
+representing different timepoints. If data is a data frame, the gene names
+can be specified using the \code{row.names()}.}
 
 \item{timepoints}{a vector of time points used in the dataset}
 
@@ -31,7 +33,10 @@ This function computes correlation based on best picked lags. The lags indicate 
 \examples{
 corr.bestlag(array(rnorm(30), c(5, 6)), max.lag = 1,
           timepoints = c(0, 5, 10, 15, 20, 25), C = 10, penalty = "high")
-
+corr.bestlag(array(runif(40, 0, 20), c(4, 10)),
+          timepoints = c(0, 0.5, 1.5, 3, 6, 12, 18, 26, 39, 50), penalty = "high")
+corr.bestlag(matrix(data = rexp(n = 40, 2), nrow = 8),
+          timepoints = c(0, 5, 15, 20, 40), penalty = "low", iter = 5)
 
 }
 \author{

@@ -2,7 +2,9 @@
 #'
 #' This function computes correlation based on best picked lags. The lags indicate delayed changes.
 #'
-#' @param data a matrix with rows representing genes and columns representing different timepoints
+#' @param data a matrix or data frame with rows representing genes and columns
+#' representing different timepoints. If data is a data frame, the gene names
+#' can be specified using the \code{row.names()}.
 #' @param max.lag a integer value of the maximum lags allowed in the dataset,
 #' if null, defaults to the floor of the number of timepoints divided by 4
 #' @param timepoints a vector of time points used in the dataset
@@ -12,13 +14,19 @@
 #' @param iter an integer indicating the number of C values to test for low penalty
 #' @return a list containing weighted correlation and best lags used in each row
 #'
-#' @examples corr.bestlag(array(rnorm(30), c(5, 6)), max.lag = 1,
+#' @examples
+#' corr.bestlag(array(rnorm(30), c(5, 6)), max.lag = 1,
 #'           timepoints = c(0, 5, 10, 15, 20, 25), C = 10, penalty = "high")
+#' corr.bestlag(array(runif(40, 0, 20), c(4, 10)),
+#'           timepoints = c(0, 0.5, 1.5, 3, 6, 12, 18, 26, 39, 50), penalty = "high")
+#' corr.bestlag(matrix(data = rexp(n = 40, 2), nrow = 8),
+#'           timepoints = c(0, 5, 15, 20, 40), penalty = "low", iter = 5)
 #'
+#' @importFrom stats var
 #'
 #' @author Thevaa Chandereng, Anthony Gitter
 #'
-#'
+#' @export corr.bestlag
 
 
 
@@ -29,10 +37,16 @@ corr.bestlag <- function(data, timepoints, max.lag = NULL, C = NULL, penalty = "
   if(is.null(max.lag)){
     max.lag <- floor(length(timepoints) / 4)
   }
-  data <- as.matrix(data)
+  #ADDED test cases to see if C > 0
+  if(!is.null(C)){
+    stopifnot(C > 0)
+  }
   #checking the condition
   stopifnot(dim(data)[2] == length(timepoints), max.lag <= length(timepoints) / 4,  is.numeric(iter),
-            penalty == "high" | penalty == "low", max.lag %% 1 == 0, iter %% 1 == 0)
+            penalty == "high" | penalty == "low", max.lag %% 1 == 0, iter %% 1 == 0, iter > 1,
+            max.lag >= 1)
+  #checking for 0 variance
+  if(any(apply(data, 1, var) == 0)){stop("At least one of the genes has 0 variance!")}
   #finding the values of C
   values <- findC(timepoints, max.lag, iter = iter)
   #if C is already given, the matrix is computed based on that value

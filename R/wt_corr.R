@@ -10,9 +10,11 @@
 #'
 #' @examples
 #' wt.corr(c(1, 2, -9, 4, 5), c(2:6), c(0.5, 1, 2, 0.5, 2))
+#' wt.corr(rnorm(5), rnorm(5), runif(5, 0, 1))
 #'
 #' @source \url{https://en.wikipedia.org/wiki/Pearson_correlation_coefficient#Weighted_correlation_coefficient}
 #'
+#' @export wt.corr
 #'
 wt.corr <- function(x, y, w){
   #checking of all the conditions are fulfilled
@@ -20,10 +22,10 @@ wt.corr <- function(x, y, w){
             length(x) == length(y), length(x) == length(w))
   #check if the weights are 0, if they are 0, add 1 to all of them
   if(all(w == 0)){
-    w <- w + 1
+    w <- rep(1, length(w))
   }
   #checking if the sum of the weights are 1, if not normalize them
-  else if(sum(w) != 1){
+  if(sum(w) != 1){
     w <- w / sum(w)
   }
   #weighted mean of x and y

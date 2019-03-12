@@ -9,8 +9,8 @@ knitr::opts_chunk$set(comment = "#>", collapse = TRUE)
 #  #OR
 #  devtools::install_version("LPWC", version = "x.x.x", repos = "http://cran.us.r-project.org")
 
-## ---- results='asis'-----------------------------------------------------
-devtools::install_github("gitter-lab/LPWC")
+## ---- eval=FALSE---------------------------------------------------------
+#  devtools::install_github("gitter-lab/LPWC")
 
 ## ----lib, results="asis", eval=TRUE--------------------------------------
 library(LPWC)

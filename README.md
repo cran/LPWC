@@ -6,6 +6,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![codecov](https://codecov.io/gh/gitter-lab/LPWC/branch/master/graph/badge.svg)](https://codecov.io/gh/gitter-lab/LPWC)
 [![Build status](https://ci.appveyor.com/api/projects/status/851q74xh2ue87tid?svg=true)](https://ci.appveyor.com/project/gitter-lab/lpwc)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/gitter-lab/LPWC-examples/master?urlpath=rstudio)
 
 **Authors**: Thevaa Chandereng and Anthony Gitter
 
@@ -55,13 +56,17 @@ Usage
 See the [vignette](https://gitter-lab.github.io/LPWC/articles/LPWC.html) for usage instructions.
 
 
+Examples
+------------
+The LPWC example repository is available [here](https://github.com/gitter-lab/LPWC-examples).
+All the example code can be executed in [binder](https://mybinder.org/v2/gh/gitter-lab/LPWC-examples/master?urlpath=rstudio). 
+
 Reference
 ------------
 If you use LPWC, please cite
 
-Lag Penalized Weighted Correlation for Time Series Clustering.
-Thevaa Chandereng, Anthony Gitter.
-*bioRxiv* 2018. [doi:10.1101/292615](https://doi.org/10.1101/292615)
+Chandereng, T., Gitter, A. Lag penalized weighted correlation for time series clustering. *BMC Bioinformatics* 21, 21 (2020). <https://doi.org/10.1186/s12859-019-3324-1>
+
 
 License
 ------------
